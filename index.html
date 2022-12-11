@@ -12,7 +12,367 @@
     </style>
   </head>
   <body>
-    let players=[],enemies=[],stars=[],circles=[],velocity=3,bonuses=[],gameOverTime=0,confettis=[],count=0,countx=0,sound,flag=!0,county=0,scores={"\uD83D\uDEF8":0,"\uD83D\uDE80":0,"\uD83D\uDEF0️":0,"\uD83D\uDE93":0,"\uD83D\uDEB2":0},gameOver=!1,t=800;function setup(){width,createCanvas(windowWidth-1,windowHeight-5),players.push(new UFO("\uD83D\uDEF8")),players.push(new UFO("\uD83D\uDE80")),players.push(new UFO("\uD83D\uDEF0️")),players.push(new UFO("\uD83D\uDE93")),players.push(new UFO("\uD83D\uDEB2"));for(let s=0;s<20;s++)enemies.push(new Enemy),stars.push(new Star);for(let e=0;e<100;e++)confettis.push(new Confetti);for(let i=0;i<160;i++)circles.push(new Circle)}function draw(){for(let s of(count++,background(0),circles))s.update(),s.show();for(let e of players)e.update(),e.show();for(let i of enemies)i.update(),i.show();for(let h of stars)h.update(),h.show();for(let o of bonuses)o.update(),o.show();for(let n of confettis)n.update(),n.show();for(let y of(fill(255),textSize(20),textAlign(CENTER),text("  < br > < br > "),players))text("              "+y.emoji+": "+scores[y.emoji],10,20*(players.indexOf(y)+1));t--,t--,text("PRESS S G J L spacebar key to switch the gravity",t--,height/2),gameOver&&(textAlign(CENTER),fill(255),textSize(20),text("Game Over",width/2,height/2),++gameOverTime>100&&(textSize(13),text("press anywhere to play again",width/2,height/2+30)))}function touchStarted(){for(let s of players)s.gravity*=-1,gameOver&&location.reload()}function keyPressed(){for(let s of players)keyCode===s.keyCode&&(s.gravity*=-1)}class Circle{constructor(){this.x=random(width),this.y=random(height)}update(){this.x=this.x-1,this.x<0&&(this.x=width,this.y=random(height),this.speed=0),this.y=this.y,this.speed=0}show(){ellipse(this.x,this.y,2,2)}}class UFO{constructor(s){this.emoji=s,this.y=height/2,this.size=60,this.velocity=0,this.gravity=.11,this.magnet=20,this.eliminated=!1,"\uD83D\uDEF8"===s&&(this.keyCode=83,this.x=60),"\uD83D\uDE80"===s&&(this.keyCode=71,this.x=100),"\uD83D\uDEF0️"===s&&(this.keyCode=74,this.x=140),"\uD83D\uDE93"===s&&(this.keyCode=76,this.x=180),"\uD83D\uDEB2"===s&&(this.keyCode=32,this.x=220)}update(){if(!this.eliminated){for(let s of(this.velocity+=this.gravity,this.y+=this.velocity,this.y>height-this.size/2&&(this.y=height-this.size/2,this.velocity=0),this.y<this.size/2&&(this.y=this.size/2,this.velocity=0),enemies))if(this.x>s.x-s.size/2&&this.x<s.x+s.size/2&&this.y>s.y-s.size/2&&this.y<s.y+s.size/2){this.eliminated=!0,scores[this.emoji]=scores[this.emoji]+"\uD83D\uDC80";for(let e=0;e<50;e++)confettis.push(new Confetti(this.x,this.y));0===players.filter(s=>!s.eliminated).length&&(gameOver=!0)}for(let i of stars)if(this.x+this.magnet>i.x-i.size/2&&this.x-this.magnet<i.x+i.size/2&&this.y+this.magnet>i.y-i.size/2&&this.y-this.magnet<i.y+i.size/2){i.x=-100,i.y=-100,3>random(6)&&bonuses.push(new Bonus);for(let h=0;h<10;h++)confettis.push(new Confetti(this.x,this.y));scores[this.emoji]++}for(let o of bonuses)if(this.x+this.magnet>o.x-o.size/2&&this.x-this.magnet<o.x+o.size/2&&this.y+this.magnet>o.y-o.size/2&&this.y-this.magnet<o.y+o.size/2){"\uD83E\uDDF2"==o.emoji&&(this.magnet+=20),"⚡"==o.emoji&&(velocity+=2),o.x=-100,o.y=-100;for(let n=0;n<30;n++)confettis.push(new Confetti(this.x,this.y))}}}show(){this.eliminated||(push(),this.gravity<0?(translate(this.x,this.y),rotate(-600),text(this.emoji,0,0)):text(this.emoji,this.x,this.y),pop())}}class Bonus{constructor(){let s=["\uD83E\uDDF2","⚡"];this.x=random(width)+width,this.y=random(height),this.size=20,this.speed=velocity,this.emoji=random(s)}update(){this.x-=this.speed,this.speed=velocity}show(){let s=this.emoji;fill(255),text(s,this.x,this.y)}}class Enemy{constructor(){let s=["\uD83C\uDF0E","\uD83D\uDEF0️","\uD83D\uDEF0️","\uD83E\uDE90","\uD83E\uDE90","\uD83C\uDF15","\uD83C\uDF11","\uD83C\uDF11","\uD83C\uDF0D","\uD83C\uDF0F"];this.x=random(width)+width,this.y=random(height),this.size=random(20,70),this.speed=velocity,this.emoji=random(s)}update(){this.x-=this.speed,this.x<0&&(this.x=width,this.y=random(height),this.speed=velocity),this.speed=velocity}show(){let s=this.emoji;fill(255),"\uD83D\uDEF0️"===s?textSize(12):textSize(this.size),text(s,this.x,this.y)}}class Star{constructor(){0!=countx&&countx<6?(flag?(this.x=2*width+20*countx++,this.y=height/2+20*countx):(county=countx,this.x=2*width+20*countx++,this.y=height/2+20*county--),5==countx&&(countx=0),flag&&(flag=!1)):(this.x=random(width)+width,this.y=random(height)),this.size=14,this.speed=velocity,count++}update(){if(this.x-=this.speed,this.x<0&&(this.x=random(width)+width,this.y=random(height),this.speed=velocity,count>60&&stars.length<50)){for(let s=0;s<6;s++)stars.push(new Star);countx++,count=0}this.speed=velocity}show(){fill(255),textSize(this.size),text("\uD83D\uDD06",this.x,this.y)}}class Confetti{constructor(s,e){this.x=s,this.y=e,this.size=random(1,3),this.speed=random(-3,3),this.angle=random(360)}update(){this.x+=this.speed*cos(this.angle),this.y+=this.speed*sin(this.angle)}show(){fill(255),noStroke(),ellipse(this.x,this.y,this.size)}}
+    <script>
+      let players = [];
+      let enemies = [];
+      let stars = []; 
+      let circles = [];
+	  let velocity = 3;
+	  let bonuses = []; 
+	  let gameOverTime =0;
+      let confettis = [];
+      let count = 0;
+      let countx = 0;
+	  let sound;
+	  let flag = true;
+      let county = 0;
+      let scores = {
+        "🛸": 0,
+        "🚀": 0,
+        "🛰️": 0,
+        "🚓": 0,
+        "🚲": 0
+      };
+      let gameOver = false;
+	  let t = 800;
+	  
+	 
+
+      function setup() {
+	    let t = width / 2;
+		 
+        createCanvas(windowWidth - 1, windowHeight - 5);
+        players.push(new UFO("🛸"));
+        players.push(new UFO("🚀"));
+        players.push(new UFO("🛰️"));
+        players.push(new UFO("🚓"));
+        players.push(new UFO("🚲"));
+		      for (let i = 0; i < 20; i++) {
+          enemies.push(new Enemy());
+          stars.push(new Star());
+		   
+        }
+		 
+        for (let i = 0; i < 100; i++) {
+          confettis.push(new Confetti());
+        }
+		
+        for (let j = 0; j < 160; j++) {
+          circles.push(new Circle());
+        }
+      }
+
+      function draw() {
+        count++;
+        background(0);
+	
+        for (let circle of circles) {
+          circle.update();
+          circle.show();
+        }
+        for (let player of players) {
+          player.update();
+          player.show();
+        }
+        for (let enemy of enemies) {
+          enemy.update();
+          enemy.show();
+        }
+        for (let star of stars) {
+          star.update();
+          star.show();
+        }
+        for (let bonus of bonuses) {
+          bonus.update();
+          bonus.show();
+        }
+        for (let confetti of confettis) {
+          confetti.update();
+          confetti.show();
+        }
+		
+        fill(255);
+        textSize(20);
+        textAlign(CENTER);
+        text("  < br > < br > ");
+          for (let player of players) {
+            text("              " + player.emoji + ": " + scores[player.emoji], 10, 20 * (players.indexOf(player) + 1));
+          }
+		 t--;
+		 t--;
+		     text("PRESS S G J L spacebar key to switch the gravity", t--, height / 2);
+          if (gameOver) {
+            textAlign(CENTER);
+            fill(255);
+            textSize(20);
+            text("Game Over", width / 2, height / 2);
+			gameOverTime++;
+			if (gameOverTime> 100){
+			textSize(13);
+			text("press anywhere to play again", width / 2, height / 2 + 30);  
+			}
+  
+        }
+		}
+			function touchStarted() {
+				for (let player of players) {             
+				  player.gravity *= -1;
+					if (gameOver) 
+					{
+						location.reload(); 
+					}             
+				}
+			}
+        function keyPressed() {
+          for (let player of players) {
+            if (keyCode === player.keyCode) {
+              player.gravity *= -1;
+            }
+          }
+        }
+        class Circle {
+          constructor() {
+            this.x = random(width);
+            this.y = random(height);
+          }
+          update() {
+            this.x = this.x - 1;
+            if (this.x < 0) {
+              this.x = width;
+              this.y = random(height);
+              this.speed = 0;
+            }
+            this.y = this.y;
+            this.speed = 0;
+          }
+          show() {
+            ellipse(this.x, this.y, 2, 2);
+          }
+        }
+        class UFO {
+          constructor(emoji) {
+            this.emoji = emoji;
+            this.y = height / 2;
+            this.size = 60;
+            this.velocity = 0;
+            this.gravity = 0.11;
+			this.magnet = 20;
+            this.eliminated = false;
+            if (emoji === "🛸") {
+              this.keyCode = 83;
+              this.x = 60;
+            }
+            if (emoji === "🚀") {
+              this.keyCode = 71;
+              this.x = 100;
+            }
+            if (emoji === "🛰️") {
+              this.keyCode = 74;
+              this.x = 140;
+            }
+            if (emoji === "🚓") {
+              this.keyCode = 76;
+              this.x = 180;
+            }
+            if (emoji === "🚲") {
+              this.keyCode = 32;
+              this.x = 220;
+            }
+          }
+          update() {
+            if (!this.eliminated) {
+              this.velocity += this.gravity;
+              this.y += this.velocity;
+              if (this.y > height - this.size / 2) {
+                this.y = height - this.size / 2;
+                this.velocity = 0;
+              }
+              if (this.y < this.size / 2) {
+                this.y = this.size / 2;
+                this.velocity = 0;
+              }
+              for (let enemy of enemies) {
+                if (this.x > enemy.x - enemy.size / 2 && this.x < enemy.x + enemy.size / 2 && this.y > enemy.y - enemy.size / 2 && this.y < enemy.y + enemy.size / 2) {
+                  this.eliminated = true;
+				    scores[this.emoji]= scores[this.emoji]+ "💀";
+				   for (let i = 0; i < 50; i++) {
+                  confettis.push(new Confetti(this.x, this.y));
+				  }
+                  if (players.filter(player => !player.eliminated).length === 0) {
+                    gameOver = true;
+                  }
+                }
+              }
+			 
+			  
+			  
+              for (let star of stars) {
+                if (this.x + this.magnet > star.x - star.size / 2 && this.x - this.magnet < star.x + star.size / 2 && this.y + this.magnet > star.y - star.size / 2 && this.y - this.magnet < star.y + star.size / 2) {
+                  star.x = -100;
+                  star.y = -100; 
+				  if (random(6) < 3){
+					    bonuses.push(new Bonus());
+				  }
+                  for (let i = 0; i < 10; i++) {
+                    confettis.push(new Confetti(this.x, this.y));
+                  }
+                  scores[this.emoji]++;
+                }
+              }
+			  
+			   
+			  for (let bonus of bonuses) {
+                if (this.x  + this.magnet > bonus.x - bonus.size / 2 && this.x - this.magnet < bonus.x + bonus.size / 2 && this.y  + this.magnet > bonus.y - bonus.size / 2 && this.y  - this.magnet < bonus.y + bonus.size / 2) {
+                 if (bonus.emoji == "🧲") {
+				 this.magnet += 20;
+				 }
+				  if (bonus.emoji == "⚡") {
+				  velocity += 2;
+				   
+				  }
+				   bonus.x = -100;
+                  bonus.y = -100;
+				   for (let i = 0; i < 30; i++) {
+                  confettis.push(new Confetti(this.x, this.y));
+				  }
+                   
+                }
+              }
+			  
+			  
+            }
+          }
+          show() {
+            if (!this.eliminated) {
+              push();
+              if (this.gravity < 0) {
+                translate(this.x, this.y);
+                rotate(-600);
+                text(this.emoji, 0, 0);
+              } else {
+                text(this.emoji, this.x, this.y);
+              }
+              pop();
+            }
+          }
+        }
+		
+		class Bonus {
+          constructor() { 
+		  let emojis = ["🧲", "⚡"];
+		   this.x = random(width) + width  ;
+            this.y = random(height);
+                this.size = 20;
+            this.speed = velocity;
+            this.emoji = random(emojis);
+            }
+         update() {
+            this.x -= this.speed; 
+			this.speed = velocity;
+          }
+          show() {
+            let emoji = this.emoji;
+            fill(255);
+            text(emoji, this.x, this.y );
+          }
+        }
+        class Enemy {
+          constructor() {
+            let emojis = ["🌎","🛰️","🛰️", "🪐","🪐","🌕","🌑","🌑","🌍", "🌏"];
+            this.x = random(width) + width  ;
+            this.y = random(height);
+            this.size = random(20, 70);
+            this.speed = velocity;
+            this.emoji = random(emojis);
+          }
+          update() {
+            this.x -= this.speed;
+            if (this.x < 0) {
+              this.x = width;
+              this.y = random(height);
+              this.speed = velocity;
+            }
+			this.speed = velocity;
+          }
+          show() {
+            let emoji = this.emoji;
+            fill(255);
+            if (emoji === "🛰️") textSize(12);
+            else textSize(this.size);
+            text(emoji, this.x, this.y );
+          }
+        }
+        class Star {
+          constructor() {
+		  
+		  if (countx != 0 && countx< 6 ){
+		  if (flag){
+		  this.x = width * 2 + countx++ *20;
+            this.y = height / 2 + countx * 20;
+			}
+			else{
+			county = countx;
+			  this.x = width * 2 + countx++ *20;
+            this.y = height / 2 + county-- * 20;
+			}
+			  if (countx == 5 ){
+			  countx = 0;
+			  }
+			  if (flag) flag=false;
+			}
+			else{
+            this.x = random(width) + width;
+            this.y = random(height);
+			}
+            this.size = 14;
+            this.speed = velocity;
+			 count++;
+          }
+		   
+          update() {
+            this.x -= this.speed;
+            if (this.x < 0) {
+               this.x = random(width) + width;
+              this.y = random(height);
+              this.speed = velocity;
+			 
+			  if(count > 60 && stars.length < 50){
+			    for (let i = 0; i < 6; i++) {           
+          stars.push(new Star());}
+		  countx++;
+		  count=0;
+		  
+		   
+        }
+		 
+            }
+			this.speed = velocity;
+          }
+          show() {
+            fill(255);
+            textSize(this.size);
+            text("🔆", this.x, this.y);
+          }
+        }
+         
+        class Confetti {
+          constructor(x, y) {
+            this.x = x;
+            this.y = y;
+            this.size = random(1, 3);
+            this.speed = random(-3, 3);
+            this.angle = random(360);
+          }
+          update() {
+            this.x += this.speed * cos(this.angle);
+            this.y += this.speed * sin(this.angle);
+          }
+          show() {
+            fill(255);
+            noStroke();
+            ellipse(this.x, this.y, this.size);
+          }
+        }
     </script>
   </body>
-</html>
+</html> 

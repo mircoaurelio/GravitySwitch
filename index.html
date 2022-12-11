@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.10.2/p5.min.js"></script>
+    <style>
+      body {
+        margin: 0;
+        background: black;
+      }
+    </style>
+  </head>
+  <body>
+    <script>
+      let players = [];
+      let enemies = [];
+      let stars = [];
+      let lineStars = [];
+      let circles = [];
+      let confettis = [];
+      let count = 0;
+      let countx = 0;
+	  let flag = true;
+      let county = 0;
+      let scores = {
+        "🛸": 0,
+        "🚀": 0,
+        "🛰️": 0,
+        "🚓": 0,
+        "🚲": 0
+      };
+      let gameOver = false;
+
+      function setup() {
+        createCanvas(windowWidth - 1, windowHeight - 5);
+        players.push(new UFO("🛸"));
+        players.push(new UFO("🚀"));
+        players.push(new UFO("🛰️"));
+        players.push(new UFO("🚓"));
+        players.push(new UFO("🚲"));
+		      for (let i = 0; i < 20; i++) {
+          enemies.push(new Enemy());
+          stars.push(new Star());
+        }
+		 
+        for (let i = 0; i < 100; i++) {
+          confettis.push(new Confetti());
+        }
+        for (let j = 0; j < 160; j++) {
+          circles.push(new Circle());
+        }
+      }
+
+      function draw() {
+        count++;
+        background(0);
+        for (let circle of circles) {
+          circle.update();
+          circle.show();
+        }
+        for (let player of players) {
+          player.update();
+          player.show();
+        }
+        for (let enemy of enemies) {
+          enemy.update();
+          enemy.show();
+        }
+        for (let star of stars) {
+          star.update();
+          star.show();
+        }
+        for (let linestar of lineStars) {
+          linestar.update();
+          linestar.show();
+        }
+        for (let confetti of confettis) {
+          confetti.update();
+          confetti.show();
+        }
+        fill(255);
+        textSize(20);
+        textAlign(CENTER);
+        text("  < br > < br > ");
+          for (let player of players) {
+            text("              " + player.emoji + ": " + scores[player.emoji], 10, 20 * (players.indexOf(player) + 1));
+          }
+          if (gameOver) {
+            textAlign(CENTER);
+            fill(255);
+            textSize(20);
+            text("Game Over", width / 2, height / 2);
+          }
+        }
+
+        function keyPressed() {
+          for (let player of players) {
+            if (keyCode === player.keyCode) {
+              player.gravity *= -1;
+            }
+          }
+        }
+        class Circle {
+          constructor() {
+            this.x = random(width);
+            this.y = random(height);
+          }
+          update() {
+            this.x = this.x - 1;
+            if (this.x < 0) {
+              this.x = width;
+              this.y = random(height);
+              this.speed = 0;
+            }
+            this.y = this.y;
+            this.speed = 0;
+          }
+          show() {
+            ellipse(this.x, this.y, 2, 2);
+          }
+        }
+        class UFO {
+          constructor(emoji) {
+            this.emoji = emoji;
+            this.y = height / 2;
+            this.size = 60;
+            this.velocity = 0;
+            this.gravity = 0.11;
+            this.eliminated = false;
+            if (emoji === "🛸") {
+              this.keyCode = 83;
+              this.x = 60;
+            }
+            if (emoji === "🚀") {
+              this.keyCode = 71;
+              this.x = 100;
+            }
+            if (emoji === "🛰️") {
+              this.keyCode = 74;
+              this.x = 140;
+            }
+            if (emoji === "🚓") {
+              this.keyCode = 76;
+              this.x = 180;
+            }
+            if (emoji === "🚲") {
+              this.keyCode = 32;
+              this.x = 220;
+            }
+          }
+          update() {
+            if (!this.eliminated) {
+              this.velocity += this.gravity;
+              this.y += this.velocity;
+              if (this.y > height - this.size / 2) {
+                this.y = height - this.size / 2;
+                this.velocity = 0;
+              }
+              if (this.y < this.size / 2) {
+                this.y = this.size / 2;
+                this.velocity = 0;
+              }
+              for (let enemy of enemies) {
+                if (this.x > enemy.x - enemy.size / 2 && this.x < enemy.x + enemy.size / 2 && this.y > enemy.y - enemy.size / 2 && this.y < enemy.y + enemy.size / 2) {
+                  this.eliminated = true;
+                  confettis.push(new Confetti(this.x, this.y));
+                  if (players.filter(player => !player.eliminated).length === 0) {
+                    gameOver = true;
+                  }
+                }
+              }
+              for (let star of stars) {
+                if (this.x > star.x - star.size / 2 && this.x < star.x + star.size / 2 && this.y > star.y - star.size / 2 && this.y < star.y + star.size / 2) {
+                  star.x = -100;
+                  star.y = -100;
+                  for (let i = 0; i < 10; i++) {
+                    confettis.push(new Confetti(this.x, this.y));
+                  }
+                  scores[this.emoji]++;
+                }
+              }
+            }
+          }
+          show() {
+            if (!this.eliminated) {
+              push();
+              if (this.gravity < 0) {
+                translate(this.x, this.y);
+                rotate(-600);
+                text(this.emoji, 0, 0);
+              } else {
+                text(this.emoji, this.x, this.y);
+              }
+              pop();
+            }
+          }
+        }
+        class Enemy {
+          constructor() {
+            let emojis = ["🌎", "🛰️", "🪐", "🌕", "🌑", "🌍", "🌏"];
+            this.x = random(width) + width / 2;
+            this.y = random(height);
+            this.size = random(20, 70);
+            this.speed = 3;
+            this.emoji = random(emojis)
+          }
+          update() {
+            this.x -= this.speed;
+            if (this.x < 0) {
+              this.x = width;
+              this.y = random(height);
+              this.speed = 3;
+            }
+          }
+          show() {
+            let emoji = this.emoji;
+            fill(255);
+            if (emoji === "🛰️") textSize(12);
+            else textSize(this.size);
+            text(emoji, this.x, this.y, );
+          }
+        }
+        class Star {
+          constructor() {
+		  if (countx != 0 && countx< 6 ){
+		  if (flag){
+		  this.x = width * 2 + countx++ *20;
+            this.y = height / 2 + countx * 20;
+			}
+			else{
+			county = countx;
+			  this.x = width * 2 + countx++ *20;
+            this.y = height / 2 + county-- * 20;
+			}
+			  if (countx == 5 ){
+			  countx = 0;
+			  }
+			  if (flag) flag=false;
+			}
+			else{
+            this.x = random(width) + width;
+            this.y = random(height);
+			}
+            this.size = 14;
+            this.speed = 3;
+			 count++;
+          }
+		   
+          update() {
+            this.x -= this.speed;
+            if (this.x < 0) {
+               this.x = random(width) + width;
+              this.y = random(height);
+              this.speed = 3;
+			 
+			  if(count > 60 && stars.length < 50){
+			    for (let i = 0; i < 6; i++) {           
+          stars.push(new Star());}
+		  countx++;
+		  count=0;
+		   
+        }
+		 
+            }
+          }
+          show() {
+            fill(255);
+            textSize(this.size);
+            text("⭐️", this.x, this.y);
+          }
+        }
+         
+        class Confetti {
+          constructor(x, y) {
+            this.x = x;
+            this.y = y;
+            this.size = random(1, 3);
+            this.speed = random(-3, 3);
+            this.angle = random(360);
+          }
+          update() {
+            this.x += this.speed * cos(this.angle);
+            this.y += this.speed * sin(this.angle);
+          }
+          show() {
+            fill(255);
+            noStroke();
+            ellipse(this.x, this.y, this.size);
+          }
+        }
+    </script>
+  </body>
+</html>

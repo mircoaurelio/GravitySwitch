@@ -91,7 +91,13 @@
             text("Game Over", width / 2, height / 2);
           }
         }
-
+			function mousePressed() {
+				for (let player of players) {
+             
+              player.gravity *= -1;
+             
+          }
+			}
         function keyPressed() {
           for (let player of players) {
             if (keyCode === player.keyCode) {
